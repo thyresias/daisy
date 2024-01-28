@@ -26,7 +26,18 @@ end
 def h.runtime_deps
   %w(
     psych    ~> 5.1
+    mp3info  ~> 0.8
   )
+end
+
+def h.devtime_deps
+  %w(
+    zlib    ~> 3.1
+  )
+end
+
+def h.all_files
+  ['Rakefile'] + doc_files + lib_files + bin_files + test_files
 end
 
 Gem::Specification.new do |s|
@@ -38,12 +49,13 @@ Gem::Specification.new do |s|
   s.license = 'MIT'
 
   s.version = h.version
+  s.date = h.all_files.map { |f| File.mtime(f) }.max.strftime('%Y-%m-%d')
 
   s.author = 'Thierry Lambert'
   s.email = 'thyresias@gmail.com'
   s.homepage = 'https://github.com/thyresias/daisy'
 
-  s.files = ['Rakefile'] + h.doc_files + h.lib_files + h.bin_files + h.test_files
+  s.files = h.all_files
 
   s.bindir = 'bin'
   s.executables = h.bin_files.map { |f| File.basename(f) }
@@ -56,4 +68,9 @@ Gem::Specification.new do |s|
   h.runtime_deps.each_slice(3) do |name, op, version|
     s.add_runtime_dependency name, ["#{op}#{version}"]
   end
+
+  h.devtime_deps.each_slice(3) do |name, op, version|
+    s.add_development_dependency name, ["#{op}#{version}"]
+  end
+
 end
