@@ -103,6 +103,9 @@ class Book
   #  Write the ncc.html file.
   private def write_ncc_html
     date = Time.now.strftime('%Y-%m-%d')
+    depth = 1  # <hX> depth
+    toc_items = 1 + chapters.size # title + chapters
+    file_count = 3 + 2 * chapters.size # ncc.html + master.smil + title.smil + (chapter.smil, chapter.mp3)
     html = <<~HTML
       <?xml version="1.0" encoding="windows-1252"?>
       <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -113,7 +116,7 @@ class Book
         <meta name="dc:creator" content="#{creator.attr_escape}" />
         <meta name="dc:date" content="#{date}" scheme="yyyy-mm-dd" />
         <meta name="dc:format" content="Daisy 2.02" />
-        <meta name="dc:identifier" content="#{identifier.attr_escape}" />
+        <meta name="dc:identifier" content="#{identifier}" />
         <meta name="dc:language" content="#{language}" />
         <meta name="dc:publisher" content="#{publisher.attr_escape}" />
         <meta name="dc:rights" content="#{rights.attr_escape}" />
@@ -123,9 +126,9 @@ class Book
         <meta name="ncc:pageFront" content="0" />
         <meta name="ncc:pageNormal" content="0" />
         <meta name="ncc:pageSpecial" content="0" />
-        <meta name="ncc:tocItems" content="#{1 + chapters.size}" />
-        <meta name="ncc:depth" content="2" />
-        <meta name="ncc:files" content="#{3 + 2 * chapters.size}" />
+        <meta name="ncc:tocItems" content="#{toc_items}" />
+        <meta name="ncc:depth" content="#{depth}" />
+        <meta name="ncc:files" content="#{file_count}" />
         <meta name="ncc:maxPageNormal" content="0" />
         <meta name="dc:source" content="#{title.attr_escape}" />
         <meta name="ncc:sourcePublisher" content="#{source_publisher.attr_escape}" />
@@ -136,7 +139,7 @@ class Book
         <meta name="ncc:totalTime" content="#{total_duration.to_hh(decimals: false)}" scheme="hh:mm:ss" />
       </head>
       <body>
-        <h1 class="title" id="Title"><a href="title.smil#Read_Title">#{title.text_escape}</a></h1>
+        <h1 class="title" id="book_title"><a href="title.smil#read_title">#{title.text_escape}</a></h1>
     HTML
 
     chapters.each { |c| html << c.ncc_ref }
@@ -159,7 +162,7 @@ class Book
           <meta name="dc:format" content="Daisy 2.02" />
           <meta name="dc:title" content="#{title.attr_escape}" />
           <meta name="title" content="#{title.attr_escape}" />
-          <meta name="dc:identifier" content="#{identifier.attr_escape}" />
+          <meta name="dc:identifier" content="#{identifier}" />
           <meta name="ncc:totalElapsedTime" content="0:00:00" />
           <meta name="ncc:timeInThisSmil" content="0:00:00" />
           <layout>
@@ -168,8 +171,8 @@ class Book
         </head>
         <body>
           <seq dur="0.000s">
-            <par endsync="last" id="Read_Title">
-              <text src="ncc.html#Title" id="Text_Title" />
+            <par endsync="last" id="read_title">
+              <text src="ncc.html#book_title" id="text_title" />
             </par>
           </seq>
         </body>
@@ -188,7 +191,7 @@ class Book
       <head>
         <meta name="dc:format" content="Daisy 2.02" />
         <meta name="dc:title" content="#{title.attr_escape}" />
-        <meta name="dc:identifier" content="#{identifier.attr_escape}" />
+        <meta name="dc:identifier" content="#{identifier}" />
         <meta name="ncc:timeInThisSmil" content="#{total_duration.to_hh}" />
         <layout><region id="txtView" /></layout>
       </head>

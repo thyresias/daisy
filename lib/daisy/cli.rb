@@ -32,9 +32,9 @@ class CLI
       #{command_name} [OPTIONS] [SOURCE] [TARGET]
 
       OPTIONS
-      -h, --help            display this text and exit
-      -e, --re-encode       re-encode mp3 files with lame
-      --                    end of options
+      -h, --help        display this text and exit
+      -e, --re-encode   re-encode mp3 files with lame
+      --                end of options
 
       SOURCE  source directory, '.' by default
       TARGET  target directory, 'SOURCE/daisy' by default
