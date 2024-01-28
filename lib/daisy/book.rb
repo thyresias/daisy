@@ -11,7 +11,6 @@ class Book
   attr_reader :source_dir
   attr_reader :target_dir
   attr_reader :re_encode
-  attr_reader :short_stories
 
   attr_reader :chapters
   attr_reader :identifier
@@ -29,12 +28,10 @@ class Book
   # - input mp3 files are in +source_dir+
   # - output mp3 files & daisy files will go to +target_dir+
   # - if +re_encode+ is true, each mp3 will be re-encoded using lame
-  # - if +short_stories+ is true, each chapter must have a title & an author
-  def initialize(source_dir, target_dir, re_encode: false, short_stories: false)
+  def initialize(source_dir, target_dir, re_encode: false)
     @source_dir = source_dir
     @target_dir = target_dir
     @re_encode = re_encode
-    @short_stories = short_stories
 
     @chapters = Dir["#{File.expand_path(source_dir)}/*.mp3"].map { |path| Chapter.new(self, path) }
     @chapters.empty? and raise Error, "no mp3 file in #{source_dir.inspect}"

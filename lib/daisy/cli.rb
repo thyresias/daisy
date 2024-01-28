@@ -8,7 +8,6 @@ class CLI
   attr_reader :command_name
 
   attr_reader :re_encode
-  attr_reader :short_stories
   attr_reader :source_dir
   attr_reader :target_dir
 
@@ -19,7 +18,7 @@ class CLI
   def run
     parse_arguments
     begin
-      book = Book.new(source_dir, target_dir, re_encode: re_encode, short_stories: short_stories)
+      book = Book.new(source_dir, target_dir, re_encode: re_encode)
       book.create_daisy
     rescue Error => ex
       warn ex.message
@@ -35,7 +34,6 @@ class CLI
       OPTIONS
       -h, --help            display this text and exit
       -e, --re-encode       re-encode mp3 files with lame
-      -s, --short-stories   short stories
       --                    end of options
 
       SOURCE  source directory, '.' by default
@@ -47,7 +45,7 @@ class CLI
       title: book title
       creator: book author
       narrator: narrator name
-      language: 2-letter ISO code like "fr", "en", etc.
+      language: ISO code like "fr", "fr-CA", "en", etc.
       publisher: ...
       rights: license terms or rights owner
       source publisher: ...
@@ -59,14 +57,12 @@ class CLI
   def parse_arguments
 
     @re_encode = false
-    @short_stories = false
 
     while ARGV.first && ARGV.first[0] == '-'
       opt = ARGV.shift
       case opt
       when '-h', '--help' then usage
       when '-e', '--re-encode' then @re_encode = true
-      when '-s', '--short-stories' then @short_stories = true
       when '--' then break
       else warn "invalid option #{opt.inspect}, ignored"
       end
