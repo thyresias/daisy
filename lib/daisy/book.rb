@@ -45,7 +45,7 @@ class Book
     read_book_info
   end
 
-  def read_book_info
+  private def read_book_info
     path = find_daisy_yaml_path
 
     begin
@@ -104,7 +104,7 @@ class Book
   end
 
   #  Write the ncc.html file.
-  def write_ncc_html
+  private def write_ncc_html
     date = Time.now.strftime('%Y-%m-%d')
     html = <<~HTML
       <?xml version="1.0" encoding="windows-1252"?>
@@ -153,7 +153,7 @@ class Book
   end
 
   #  Write the title.smil file.
-  def write_title_smil
+  private def write_title_smil
     xml = <<~XML
       <?xml version="1.0" encoding="windows-1252"?>
       <!DOCTYPE smil PUBLIC "-//W3C//DTD SMIL 1.0//EN" "http://www.w3.org/TR/REC-SMIL/SMIL10.dtd">
@@ -183,7 +183,7 @@ class Book
   end
 
   #  Write the master.smil file.
-  def write_master_smil
+  private def write_master_smil
     xml = <<~XML
       <?xml version="1.0" encoding="windows-1252"?>
       <!DOCTYPE smil PUBLIC "-//W3C//DTD SMIL 1.0//EN" "http://www.w3.org/TR/REC-SMIL/SMIL10.dtd">

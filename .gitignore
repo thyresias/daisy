@@ -2,3 +2,4 @@ test-full/*
 test/fixtures-mp3info/*.mp3
 test/fixtures*/daisy/
 *.gem
+doc/rdoc
