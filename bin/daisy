@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require 'daisy'
+Daisy::CLI.new(File.basename(__FILE__)).run
