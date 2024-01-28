@@ -49,18 +49,20 @@ class Chapter
   #  Entry in the ncc.html file for the chapter.
   def ncc_ref
     if book.short_stories
-      <<~HTML
-        <h2 id="Chapter_#{position}">
+      html = <<~HTML
+        <h1 id="Chapter_#{position}" class="section">
           <a href="#{smil_file}#Read_#{position}">#{chapter_title.text_escape} by #{author.text_escape}</a>
-        </h2>
+        </h1>
       HTML
     else
-      <<~HTML
-        <h2 id="Chapter_#{position}">
+      html = <<~HTML
+        <h1 id="Chapter_#{position}" class="section">
           <a href="#{smil_file}#Read_#{position}">#{chapter_title.text_escape}</a>
-        </h2>
+        </h1>
       HTML
     end
+
+    html.lines.map { |line| "  #{line}" }.join
   end
 
   #  Entry in the master.smil file for the chapter.

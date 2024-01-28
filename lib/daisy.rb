@@ -8,14 +8,14 @@ module Daisy
 
   # execute code with warnings temporarily off
   def self.without_warning
-      old, $-w = $-w, nil
-      begin
-        result = yield
-      ensure
-        $-w = old
-      end
-      result
+    old, $-w = $-w, nil
+    begin
+      result = yield
+    ensure
+      $-w = old
     end
+
+    result
   end
 
   without_warning { require 'mp3info' }

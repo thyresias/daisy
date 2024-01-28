@@ -1,7 +1,7 @@
 module Daisy
 
 ##
-# Command line interpreter
+# Command line interpreter.
 
 class CLI
 
@@ -39,9 +39,9 @@ class CLI
       --                    end of options
 
       SOURCE  source directory, '.' by default
-      TARGET  target directory, 'daisy' by default
+      TARGET  target directory, 'SOURCE/daisy' by default
 
-      The current directory must contain a "daisy.yaml" file.
+      The source directory or one of its parents must contain a "daisy.yaml" or "daisy.yml" file.
       In this file, the first 2 keys are required:
       ---
       title: book title
@@ -73,7 +73,7 @@ class CLI
     end
 
     @source_dir = ARGV.shift || '.'
-    @target_dir = ARGV.shift || 'daisy'
+    @target_dir = ARGV.shift || "#{source_dir}/daisy"
 
     unless ARGV.empty?
       warn "extra arguments ignored: #{ARGV.map(&:inspect).join(', ')}"

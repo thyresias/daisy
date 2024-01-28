@@ -14,20 +14,21 @@ class Book
   attr_reader :short_stories
 
   attr_reader :chapters
-
-  attr_reader :language
   attr_reader :identifier
+
   attr_reader :title
   attr_reader :creator
+  attr_reader :narrator
+  attr_reader :language
   attr_reader :publisher
   attr_reader :rights
   attr_reader :source_publisher
   attr_reader :source_edition
-  attr_reader :narrator
 
   # Creates a new Book:
   # - input mp3 files are in +source_dir+
   # - output mp3 files & daisy files will go to +target_dir+
+  # - if +re_encode+ is true, each mp3 will be re-encoded using lame
   # - if +short_stories+ is true, each chapter must have a title & an author
   def initialize(source_dir, target_dir, re_encode: false, short_stories: false)
     @source_dir = source_dir
@@ -35,37 +36,37 @@ class Book
     @re_encode = re_encode
     @short_stories = short_stories
 
-    @chapters = Dir["#{source_dir}/*.mp3"].map { |path| Chapter.new(self, path) }
+    @chapters = Dir["#{File.expand_path(source_dir)}/*.mp3"].map { |path| Chapter.new(self, path) }
     @chapters.empty? and raise Error, "no mp3 file in #{source_dir.inspect}"
     @chapters.sort_by!(&:file)
     @chapters.each.with_index(1) { |c, i| c.position = i }
 
-    raise Error, "daisy.yaml not found" unless File.exist?("daisy.yaml")
-    book_info "daisy.yaml"
+    @identifier = SecureRandom.uuid
+    read_book_info
   end
 
-  def book_info(path)
+  def read_book_info
+    path = find_daisy_yaml_path
+
     begin
       tags = YAML.load_file(path)
     rescue => ex
       warn "could not read #{path.inspect}:"
       warn ex.message
-      tags = {}
+      raise Error, 'cannot continue'
     end
     unless tags.is_a?(Hash)
-      warn "invalid content in #{path.inspect}"
-      tags = {}
+      raise Error, "invalid content in #{path.inspect}"
     end
 
-    @language = tags.delete('language') || 'fr'
-    @identifier = SecureRandom.uuid
     @title = tags.delete('title')
     @creator = tags.delete('creator')
+    @narrator = tags.delete('narrator') || 'narrateur inconnu'
+    @language = tags.delete('language') || 'fr'
     @publisher = tags.delete('publisher') || 'éditeur inconnu'
     @rights = tags.delete('rights') || 'droits inconnus'
     @source_publisher = tags.delete('source publisher') || 'éditeur source inconnu'
     @source_edition = tags.delete('source edition') || 'édition source inconnue'
-    @narrator = tags.delete('narrator') || 'narrateur inconnu'
 
     tags.empty? or
       warn "invalid keys in #{path}: #{tags.keys.map(&:inspect).join(', ')}"
@@ -74,6 +75,28 @@ class Book
       raise Error, "title & creator are required in #{path}"
 
   end
+
+  private def find_daisy_yaml_path
+    start_dir = File.expand_path(source_dir)
+    dir = start_dir
+    path = nil
+    loop do
+      pattern = "#{dir}/daisy.{yaml,yml}"
+      paths = Dir.glob(pattern)
+      unless paths.empty?
+        path = paths.first
+        break
+      end
+      up = File.dirname(dir)
+      break if up == dir
+      dir = up
+    end
+
+    raise Error, "daisy.yaml/.yml not found going up from #{start_dir}" unless path
+
+    path
+  end
+
 
   # total book duration from chapter durations
   def total_duration
@@ -116,7 +139,7 @@ class Book
         <meta name="ncc:totalTime" content="#{total_duration.to_hh(decimals: false)}" scheme="hh:mm:ss" />
       </head>
       <body>
-      <h1 class="title" id="Title"><a href="title.smil#Read_Title">#{title.text_escape}</a></h1>
+        <h1 class="title" id="Title"><a href="title.smil#Read_Title">#{title.text_escape}</a></h1>
     HTML
 
     chapters.each { |c| html << c.ncc_ref }
@@ -194,7 +217,7 @@ class Book
     write_ncc_html
     write_title_smil
     puts "Contents:"
-    elapsed_time = 0
+    elapsed_time = 0.0
     chapters.each do |c|
       puts "- #{c.position}. #{c.chapter_title}"
       c.copy_mp3 re_encode: re_encode

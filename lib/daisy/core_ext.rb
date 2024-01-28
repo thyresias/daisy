@@ -5,11 +5,11 @@ module Daisy
 
 module CoreExt
 
-  refine String do
+  # :stopdoc:
+  HTML_ESCAPE_MAP = { '&' => '&amp;', '"' => '&quot;', '<' => '&lt;', '>' => '&gt;' }
+  # :startdoc:
 
-    # :stopdoc:
-    HTML_ESCAPE_MAP = { '&' => '&amp;', '"' => '&quot;', '<' => '&lt;', '>' => '&gt;' }
-    # :startdoc:
+  refine String do
 
     # Returns the string with the following characters escaped to HTML entities:
     #   < => &lt;
