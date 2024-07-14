@@ -1,6 +1,6 @@
 # DAISY Audio
 
-DAISY audio format support.
+DAISY audio format creation.
 
 ## Installation
 
@@ -10,13 +10,25 @@ $ gem install daisy-audio
 
 ## Synopsis
 
+Say your current directory contains a series of mp3 files.
+Create a file `daisy.yaml` with the following content:
+
+```yaml
+---
+title: the title
+creator: the author
+```
+
+Then issue the command:
+
 ```
 $ daisy
 ```
 
-This ...
+This will convert the files in the current directory, creating the daisy format
+in `./daisy`.
 
-Type `daisy -h` for more info on the command.
+Use `daisy -h` for more info on the command.
 
 ## License
 

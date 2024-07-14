@@ -8,26 +8,51 @@ module Daisy
 
 class Book
 
+  # directory for source mp3 files
   attr_reader :source_dir
+
+  # directory where the DAISY files will be stored
   attr_reader :target_dir
+
+  # re-encode with lame?
   attr_reader :re_encode
 
+  # array of Chapter objects, one by input mp3 file
   attr_reader :chapters
+
+  # generated unique identifier
   attr_reader :identifier
 
+  # book title
   attr_reader :title
+
+  # book author
   attr_reader :creator
+
+  # book narrator
   attr_reader :narrator
+
+  # book language
   attr_reader :language
+
+  # book publisher
   attr_reader :publisher
+
+  # book rights
   attr_reader :rights
+
+  # book source publisher
   attr_reader :source_publisher
+
+  # book source edition
   attr_reader :source_edition
 
   # Creates a new Book:
   # - input mp3 files are in +source_dir+
   # - output mp3 files & daisy files will go to +target_dir+
   # - if +re_encode+ is true, each mp3 will be re-encoded using lame
+  #
+  # Raises an error if no mp3 file is found.
   def initialize(source_dir, target_dir, re_encode: false)
     @source_dir = source_dir
     @target_dir = target_dir
@@ -42,6 +67,7 @@ class Book
     read_book_info
   end
 
+  # Reads the information in the <tt>daisy.yaml</tt> or <tt>daisy.yml</tt> file.
   private def read_book_info
     path = find_daisy_yaml_path
 
@@ -73,6 +99,9 @@ class Book
 
   end
 
+  # Returns the path to the <tt>daisy.yaml</tt> or <tt>daisy.yml</tt> file,
+  # starting from #source_dir and going up. Raises an Error if
+  # no such file.
   private def find_daisy_yaml_path
     start_dir = File.expand_path(source_dir)
     dir = start_dir
@@ -89,15 +118,32 @@ class Book
       dir = up
     end
 
-    raise Error, "daisy.yaml/.yml not found going up from #{start_dir}" unless path
+    raise Error, "daisy.yaml/daisy.yml not found going up from #{start_dir}" unless path
 
     path
   end
 
-
   # total book duration from chapter durations
   def total_duration
     chapters.map(&:duration).sum
+  end
+
+  #  Create all the DAISY metadata for the book.
+  def create_daisy
+    puts "Creating DAISY format in #{target_dir}"
+    puts "Title: #{title.inspect}"
+    FileUtils.mkpath target_dir unless File.directory?(target_dir)
+    write_ncc_html
+    write_title_smil
+    puts "Contents:"
+    elapsed_time = 0.0
+    chapters.each do |c|
+      puts "- #{c.position}. #{c.chapter_title}"
+      c.copy_mp3 re_encode: re_encode
+      c.write_smil elapsed_time
+      elapsed_time += c.duration
+    end
+    write_master_smil
   end
 
   #  Write the ncc.html file.
@@ -207,24 +253,6 @@ class Book
     XML
 
     File.write "#{target_dir}/master.smil", xml, mode: 'wb:windows-1252'
-  end
-
-  #  Create all the DAISY metadata for the book.
-  def create_daisy
-    puts "Creating DAISY format in #{target_dir}"
-    puts "Title: #{title.inspect}"
-    FileUtils.mkpath target_dir unless File.directory?(target_dir)
-    write_ncc_html
-    write_title_smil
-    puts "Contents:"
-    elapsed_time = 0.0
-    chapters.each do |c|
-      puts "- #{c.position}. #{c.chapter_title}"
-      c.copy_mp3 re_encode: re_encode
-      c.write_smil elapsed_time
-      elapsed_time += c.duration
-    end
-    write_master_smil
   end
 
 end

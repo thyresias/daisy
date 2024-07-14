@@ -10,5 +10,4 @@ https://daisy.org/activities/standards/daisy/daisy-2/daisy-format-2-02-specifica
 
 MP3:
 > As some audio playback systems may not be able to decode VBR correctly it is not recommended
-> for use with DAISY DTB’s."
-
+> for use with DAISY DTB’s.

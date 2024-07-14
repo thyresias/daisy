@@ -8,17 +8,32 @@ module Daisy
 
 class Chapter
 
-  attr_reader :book       # parent Book instance
-  attr_reader :file       # base mp3 file name
+  # parent Book instance
+  attr_reader :book
 
-  attr_reader :album      # mp3 tag "album"
-  attr_reader :title      # mp3 tag "title"
-  attr_reader :author     # mp3 tag "artist"
-  attr_reader :track      # mp3 tag "tracknum"
-  attr_reader :duration   # mp3 duration (Float, seconds)
+  # base mp3 file name
+  attr_reader :file
 
-  attr_accessor :position # assigned by the book
+  # mp3 tag "album"
+  attr_reader :album
 
+  # mp3 tag "title"
+  attr_reader :title
+
+  # mp3 tag "artist"
+  attr_reader :author
+
+  # mp3 tag "tracknum"
+  attr_reader :track
+
+  # mp3 duration (Float, seconds)
+  attr_reader :duration
+
+  # assigned by the book
+  attr_accessor :position
+
+  # Creates a new Chapter for Book +book+, attached to the mp3 file +path+,
+  # retrieving its mp3tag information.
   def initialize(book, path)
     @book = book
     @file = File.basename(path)
@@ -37,6 +52,10 @@ class Chapter
     end
   end
 
+  # Returns the chapter title:
+  # - #title if set
+  # - otherwise, if this is the only chapter, the book title
+  # - otherwise, "Chapter X" where X is the #position.
   def chapter_title
     title || (book.chapters.size > 1 ? "Chapitre #{position}" : book.title)
   end
@@ -62,7 +81,8 @@ class Chapter
     %(<ref title="#{chapter_title.attr_escape}" src="#{smil_file.attr_escape}" id="Master_#{position}"/>)
   end
 
-  #  Write the chapter smil_file file.
+  # Write the chapter smil_file file, with +elapsed_time+ seconds representing the
+  # elapsed time for all preceding chapters.
   def write_smil(elapsed_time)
     File.write "#{book.target_dir}/#{smil_file}", <<~XML, mode: 'wb:windows-1252'
       <?xml version="1.0" encoding="windows-1252"?>
@@ -91,7 +111,10 @@ class Chapter
     XML
   end
 
+  # lame command line
   TIDY_MP3 = "lame -a -t --strictly-enforce-ISO -b56 --resample 44.1"
+
+  #--
   # -a  Downmix from stereo to mono file for mono encoding. Needed with RAW input for the -mm mode to do the downmix.
   # -t  Disable VBR informational tag
   # --strictly-enforce-ISO  Comply as much as possible to ISO MPEG spec
@@ -121,7 +144,10 @@ class Chapter
   #   (track and total each 1 to 255. just the track number creates v1.1 tag, providing a total forces v2.0).
   # --tg genre  Audio/song genre (name or number in list)
   # --ti file   Audio/song albumArt (jpeg/png/gif file, 128KB max, v2.3)
+  #++
 
+  # Copies the mp3 source file to the book target directory, re-encoding it with
+  # lame if +re_encode+ is true.
   def copy_mp3(re_encode: false)
     source = "#{book.source_dir}/#{file}"
     target = "#{book.target_dir}/#{file}"

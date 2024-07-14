@@ -1,8 +1,9 @@
-# initially from https://github.com/Memotech-Bill/make_daisy
-
 require 'fileutils'
 require 'securerandom'
 require 'yaml'
+
+##
+# Containing namespace.
 
 module Daisy
 

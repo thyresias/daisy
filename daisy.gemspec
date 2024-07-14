@@ -42,7 +42,7 @@ end
 
 Gem::Specification.new do |s|
   s.name = 'daisy-audio'
-  s.summary = "DAISY audio format support."
+  s.summary = "DAISY audio format creation."
   s.description = <<~TEXT
     Creates DAISY-compliant files.
   TEXT

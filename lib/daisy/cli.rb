@@ -5,16 +5,24 @@ module Daisy
 
 class CLI
 
+  # name of the command
   attr_reader :command_name
 
+  # re-encode option
   attr_reader :re_encode
+
+  # source directory
   attr_reader :source_dir
+
+  # target directory
   attr_reader :target_dir
 
+  # Creates the interpreter for a command named +command_name+.
   def initialize(command_name)
     @command_name = command_name
   end
 
+  # Runs the interpreter.
   def run
     parse_arguments
     begin
@@ -26,6 +34,7 @@ class CLI
     end
   end
 
+  # Displays the command usage and exits.
   def usage
     puts <<~EOT.lines.map { |t| "  #{t}" }
 
@@ -54,7 +63,8 @@ class CLI
     exit
   end
 
-  def parse_arguments
+  # Parses the options and command line arguments.
+  private def parse_arguments
 
     @re_encode = false
 
@@ -69,7 +79,7 @@ class CLI
     end
 
     @source_dir = ARGV.shift || '.'
-    @target_dir = ARGV.shift || "#{source_dir}/daisy"
+    @target_dir = ARGV.shift || "#{@source_dir}/daisy"
 
     unless ARGV.empty?
       warn "extra arguments ignored: #{ARGV.map(&:inspect).join(', ')}"
