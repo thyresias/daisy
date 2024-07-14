@@ -7,6 +7,12 @@ task 'gem' do
   system 'gem install daisy-audio --local'
 end
 
+desc 'publish the gem'
+task 'push' do
+  gemfile = Dir['*.gem'].sort.last
+  system "gem push #{gemfile}"
+end
+
 desc 'create RDoc documentation'
 task 'rdoc' do
   require 'rdoc/rdoc'
