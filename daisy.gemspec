@@ -65,6 +65,8 @@ Gem::Specification.new do |s|
     '--title' << 'DAISY Audio' <<
     '--main' << h.doc_files.first
 
+  s.required_ruby_version = '>= 3.0'
+
   h.runtime_deps.each_slice(3) do |name, op, version|
     s.add_runtime_dependency name, ["#{op}#{version}"]
   end
