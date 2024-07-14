@@ -22,7 +22,17 @@ task 'rdoc' do
   RDoc::RDoc.new.document(args)
 end
 
-desc 'run all tests'
+desc 'run the tests'
 task 'test' do
-  # TODO
+  Dir.chdir('test') do
+
+    ARGV.clear
+    ARGV << 'fixtures-id3tag'
+    Daisy::CLI.new('daisy').run
+
+    ARGV.clear
+    ARGV << 'fixtures-mp3info'
+    Daisy::CLI.new('daisy').run
+
+  end
 end
